@@ -216,5 +216,5 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    renderOrders(); // Inițializăm tabelul cu sortare implicită
+    renderOrders(); // Inițializăm tabelul cu sortare implicită orderDate-asc
 });
