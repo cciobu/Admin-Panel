@@ -316,3 +316,60 @@ body {
     margin-bottom: 0.75rem;
     gap: 0.5rem;
 }
+
+/* Ajustări pentru Orders pe mobil */
+@media (max-width: 768px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .flex-col > .sidebar + .main-content {
+        margin-top: 1rem;
+    }
+
+    #orders-table td {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+
+    #order-modal .modal-content {
+        width: 90%;
+        max-width: none;
+    }
+
+    .btn-neon,
+    input,
+    select,
+    textarea {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Stiluri pentru butoanele de paginare */
+.page-btn {
+    padding: 0.5rem 1rem;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 0.5rem;
+    transition: background 0.3s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: rgba(59, 130, 246, 0.3);
+}
+
+.page-btn.active {
+    background: #3b82f6;
+    font-weight: bold;
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
