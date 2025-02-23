@@ -6,8 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const tableBody = document.getElementById("orders-table");
     const exportBtn = document.getElementById("export-btn");
     const searchInput = document.getElementById("search-input");
-    const dateFilter = document.getElementById("date-filter");
-    const costFilter = document.getElementById("cost-filter");
+    const sortDropdown = document.getElementById("sort-dropdown");
     const pagination = document.getElementById("pagination");
     const addOrderBtn = document.getElementById("add-order-btn");
     const orderModal = document.getElementById("order-modal");
@@ -49,15 +48,33 @@ document.addEventListener("DOMContentLoaded", () => {
         return allOrders;
     }
 
-    function renderOrders(search = "", date = "", minCost = "") {
+    function sortOrders(orders, sortType) {
+        const [field, direction] = sortType.split("-");
+        return orders.sort((a, b) => {
+            let valA, valB;
+            if (field === "cost") {
+                valA = a.cost || 0;
+                valB = b.cost || 0;
+            } else {
+                valA = a[field];
+                valB = b[field];
+            }
+            if (direction === "asc") {
+                return valA > valB ? 1 : -1;
+            } else {
+                return valA < valB ? 1 : -1;
+            }
+        });
+    }
+
+    function renderOrders(search = "", sortType = "orderDate-asc") {
         tableBody.innerHTML = "";
         const allOrders = getAllOrders();
         let filteredOrders = allOrders.filter(order => 
-            (order.orderName.toLowerCase().includes(search.toLowerCase()) || 
-             order.clientName.toLowerCase().includes(search.toLowerCase())) &&
-            (!date || order.orderDate === date) &&
-            (!minCost || (order.cost || 0) >= parseFloat(minCost))
+            order.orderName.toLowerCase().includes(search.toLowerCase()) || 
+            order.clientName.toLowerCase().includes(search.toLowerCase())
         );
+        sortOrders(filteredOrders, sortType);
         const start = (currentTablePage - 1) * ordersPerPage;
         const end = start + ordersPerPage;
         const paginatedOrders = filteredOrders.slice(start, end);
@@ -100,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
         prevBtn.addEventListener("click", () => {
             if (currentTablePage > 1) {
                 currentTablePage--;
-                renderOrders(searchInput.value, dateFilter.value, costFilter.value);
+                renderOrders(searchInput.value, sortDropdown.value);
             }
         });
         pagination.appendChild(prevBtn);
@@ -111,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
             pageBtn.className = `page-btn text-white ${i === currentTablePage ? 'active' : ''}`;
             pageBtn.addEventListener("click", () => {
                 currentTablePage = i;
-                renderOrders(searchInput.value, dateFilter.value, costFilter.value);
+                renderOrders(searchInput.value, sortDropdown.value);
             });
             pagination.appendChild(pageBtn);
         }
@@ -123,28 +140,26 @@ document.addEventListener("DOMContentLoaded", () => {
         nextBtn.addEventListener("click", () => {
             if (currentTablePage < totalPages) {
                 currentTablePage++;
-                renderOrders(searchInput.value, dateFilter.value, costFilter.value);
+                renderOrders(searchInput.value, sortDropdown.value);
             }
         });
         pagination.appendChild(nextBtn);
     }
 
-    // Event listeners pentru filtre
+    // Event listeners
     searchInput.addEventListener("input", () => {
         currentTablePage = 1;
-        renderOrders(searchInput.value, dateFilter.value, costFilter.value);
+        renderOrders(searchInput.value, sortDropdown.value);
     });
-    dateFilter.addEventListener("change", () => {
+
+    sortDropdown.addEventListener("change", () => {
         currentTablePage = 1;
-        renderOrders(searchInput.value, dateFilter.value, costFilter.value);
-    });
-    costFilter.addEventListener("input", () => {
-        currentTablePage = 1;
-        renderOrders(searchInput.value, dateFilter.value, costFilter.value);
+        renderOrders(searchInput.value, sortDropdown.value);
     });
 
     exportBtn.addEventListener("click", () => {
         const allOrders = getAllOrders();
+        sortOrders(allOrders, sortDropdown.value); // Exportăm sortat
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allOrders));
         const downloadAnchor = document.createElement("a");
         downloadAnchor.setAttribute("href", dataStr);
@@ -196,10 +211,10 @@ document.addEventListener("DOMContentLoaded", () => {
             clients[clientIndex].orders = clients[clientIndex].orders || [];
             clients[clientIndex].orders.push(newOrder);
             saveClients(clients);
-            renderOrders(searchInput.value, dateFilter.value, costFilter.value);
+            renderOrders(searchInput.value, sortDropdown.value);
             orderModal.classList.add("hidden");
         });
     });
 
-    renderOrders(); // Inițializăm tabelul
+    renderOrders(); // Inițializăm tabelul cu sortare implicită
 });
