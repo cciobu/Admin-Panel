@@ -375,7 +375,7 @@ body {
     ot-allowed;
 }
 
-/* Stil pentru dropdown-ul de sortare sub titlu */
+/* Stil pentru dropdown-ul de sortare sub butoane */
 #sort-dropdown {
     margin-top: 0.5rem;
     max-width: 10rem; /* 160px, echivalentul w-40 din Tailwind */
