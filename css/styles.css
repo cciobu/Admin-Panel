@@ -371,5 +371,18 @@ body {
 
 .page-btn:disabled {
     opacity: 0.5;
-    cursor: not-allowed;
+    cursor: n
+    ot-allowed;
+}
+
+/* Stil pentru dropdown-ul de sortare sub titlu */
+#sort-dropdown {
+    margin-top: 0.5rem;
+    max-width: 16rem; /* 256px, similar cu md:w-64 */
+}
+
+@media (max-width: 768px) {
+    #sort-dropdown {
+        max-width: 100%;
+    }
 }
