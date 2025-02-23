@@ -378,7 +378,7 @@ body {
 /* Stil pentru dropdown-ul de sortare sub titlu */
 #sort-dropdown {
     margin-top: 0.5rem;
-    max-width: 12rem; /* 192px, echivalentul w-48 din Tailwind */
+    max-width: 10rem; /* 160px, echivalentul w-40 din Tailwind */
 }
 
 @media (max-width: 768px) {
