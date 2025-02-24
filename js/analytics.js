@@ -48,15 +48,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Configurăm graficul Total Comenzi pe Clienți (nou)
-    const ctxOrders = document.getElementById("ordersByClientsChart").getContext("2d");
-    const ordersByClientsChart = new Chart(ctxOrders, {
+    // Configurăm graficul Total Comenzi pe Lună/An (nou)
+    const ctxOrders = document.getElementById("ordersByMonthYearChart").getContext("2d");
+    const ordersByMonthYearChart = new Chart(ctxOrders, {
         type: "bar", // Tipul graficului bară
         data: {
-            labels: clients.map(client => client.name), // Numele clienților pe axa X
+            labels: [], // Vom calcula etichetele (luni/ani) din date
             datasets: [{
                 label: "Număr de comenzi",
-                data: clients.map(client => (client.orders || []).length), // Numărul de comenzi per client
+                data: [], // Vom calcula datele (numărul de comenzi pe lună/an)
                 backgroundColor: "#3b82f6", // Culoare albastră, conform design-ului
                 borderColor: "#1e293b", // Bordură gri închis
                 borderWidth: 1
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 },
                 title: {
                     display: true,
-                    text: "Total Comenzi pe Clienți",
+                    text: "Total Comenzi pe Lună/An",
                     color: "#e2e8f0",
                     font: {
                         size: 16
@@ -93,4 +93,43 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
+
+    // Funcție pentru a calcula comenzile pe lună/an
+    function calculateOrdersByMonthYear() {
+        const orders = [];
+        clients.forEach(client => {
+            (client.orders || []).forEach(order => {
+                if (order.orderDate) {
+                    const date = new Date(order.orderDate);
+                    const year = date.getFullYear();
+                    const month = date.toLocaleString('default', { month: 'long' }); // Numele lunii (ex. "Februarie")
+                    orders.push({ year, month });
+                }
+            });
+        });
+
+        // Grupăm comenzile pe lună și an
+        const ordersByMonthYear = {};
+        orders.forEach(order => {
+            const key = `${order.month} ${order.year}`;
+            ordersByMonthYear[key] = (ordersByMonthYear[key] || 0) + 1;
+        });
+
+        // Sortăm lunile/anii cronologic
+        const sortedKeys = Object.keys(ordersByMonthYear).sort((a, b) => {
+            const [monthA, yearA] = a.split(" ");
+            const [monthB, yearB] = b.split(" ");
+            const dateA = new Date(yearA, new Date(Date.parse(monthA + " 1, " + yearA)).getMonth());
+            const dateB = new Date(yearB, new Date(Date.parse(monthB + " 1, " + yearB)).getMonth());
+            return dateA - dateB;
+        });
+
+        // Actualizăm datele și etichetele graficului
+        ordersByMonthYearChart.data.labels = sortedKeys;
+        ordersByMonthYearChart.data.datasets[0].data = sortedKeys.map(key => ordersByMonthYear[key]);
+        ordersByMonthYearChart.update();
+    }
+
+    // Apelăm funcția după ce graficul este creat
+    calculateOrdersByMonthYear();
 });
