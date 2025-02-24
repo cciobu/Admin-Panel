@@ -17,13 +17,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const statusInput = document.getElementById("client-status");
     const searchInput = document.getElementById("search-input");
     const pagination = document.getElementById("pagination");
+    const sortDropdown = document.getElementById("sort-dropdown");
 
-    function renderClients(filter = "") {
+    function sortClients(clients, sortType) {
+        const [field, direction] = sortType.split("-");
+        return clients.sort((a, b) => {
+            let valA = a[field];
+            let valB = b[field];
+            if (field === "status") {
+                valA = valA === "Activ" ? 0 : 1;
+                valB = valB === "Activ" ? 0 : 1;
+            }
+            if (direction === "asc") {
+                return valA > valB ? 1 : -1;
+            } else {
+                return valA < valB ? 1 : -1;
+            }
+        });
+    }
+
+    function renderClients(filter = "", sortType = "name-asc") {
         tableBody.innerHTML = ""; // Resetăm tabelul
         const filteredClients = clients.filter(client => 
             client.name.toLowerCase().includes(filter.toLowerCase()) || 
             client.email.toLowerCase().includes(filter.toLowerCase())
         );
+        sortClients(filteredClients, sortType);
         const start = (currentTablePage - 1) * clientsPerPage;
         const end = start + clientsPerPage;
         const paginatedClients = filteredClients.slice(start, end);
@@ -80,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
         prevBtn.addEventListener("click", () => {
             if (currentTablePage > 1) {
                 currentTablePage--;
-                renderClients(searchInput.value);
+                renderClients(searchInput.value, sortDropdown.value);
             }
         });
         pagination.appendChild(prevBtn);
@@ -91,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
             pageBtn.className = `page-btn text-white ${i === currentTablePage ? 'active' : ''}`;
             pageBtn.addEventListener("click", () => {
                 currentTablePage = i;
-                renderClients(searchInput.value);
+                renderClients(searchInput.value, sortDropdown.value);
             });
             pagination.appendChild(pageBtn);
         }
@@ -103,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
         nextBtn.addEventListener("click", () => {
             if (currentTablePage < totalPages) {
                 currentTablePage++;
-                renderClients(searchInput.value);
+                renderClients(searchInput.value, sortDropdown.value);
             }
         });
         pagination.appendChild(nextBtn);
@@ -111,7 +130,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     searchInput.addEventListener("input", (e) => {
         currentTablePage = 1;
-        renderClients(e.target.value);
+        renderClients(e.target.value, sortDropdown.value);
+    });
+
+    sortDropdown.addEventListener("change", () => {
+        currentTablePage = 1;
+        renderClients(searchInput.value, sortDropdown.value);
     });
 
     exportBtn.addEventListener("click", () => {
@@ -153,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         saveClients(clients);
-        renderClients(searchInput.value);
+        renderClients(searchInput.value, sortDropdown.value);
         modal.classList.add("hidden");
     });
 
@@ -172,9 +196,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (confirm("Sigur vrei să ștergi acest client?")) {
             clients.splice(index, 1);
             saveClients(clients);
-            renderClients(searchInput.value);
+            renderClients(searchInput.value, sortDropdown.value);
         }
     };
 
-    renderClients(); // Inițializăm tabelul
+    renderClients(); // Inițializăm tabelul cu sortare implicită name-asc
 });
