@@ -108,7 +108,7 @@ body {
 
 /* Ajustare dimensiuni canvas pentru a se potrivi cardurilor */
 #clientsChart,
-#ordersByClientsChart {
+#ordersByMonthYearChart {
     max-width: 100% !important;
     max-height: 300px !important;
     width: 100% !important;
