@@ -87,22 +87,32 @@ body {
     transform: none !important; /* Fără mărire la hover */
 }
 
+/* Ajustare stiluri pentru cardurile din Analize */
 .grid .card {
     background: rgba(30, 41, 59, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
     transition: all 0.3s ease;
     border-radius: 0.5rem;
-    max-width: 400px; /* Lățime fixă, conform design-ului */
-    margin-left: 0; /* Aliniere la stânga */
-    margin-right: auto; /* Spațiu la dreapta */
+    max-width: 400px;
+    margin-left: 0;
+    margin-right: auto;
     width: 100%;
-    transform: none !important; /* Fără mărire pe card */
+    transform: none !important;
 }
 
 .grid .card:hover {
-    transform: none !important; /* Fără mărire la hover */
+    transform: none !important;
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+/* Ajustare dimensiuni canvas pentru a se potrivi cardurilor */
+#clientsChart,
+#ordersByClientsChart {
+    max-width: 100% !important;
+    max-height: 300px !important;
+    width: 100% !important;
+    height: auto !important;
 }
 
 /* Suprascrie orice stil anterior care ar putea afecta graficul */
