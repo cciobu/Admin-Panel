@@ -115,6 +115,28 @@
                     </form>
                 </div>
             </div>
+
+            <!-- Modal Detalii Comandă -->
+            <div id="order-details-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
+                <div class="modal-content p-6 rounded-lg bg-gray-900 w-full max-w-md shadow-lg border border-blue-600 max-h-[80vh] overflow-y-auto">
+                    <h2 id="order-details-title" class="text-xl font-bold text-white mb-6">Detalii Comandă</h2>
+                    <div class="space-y-4">
+                        <p class="text-gray-400"><span class="font-medium">Nume:</span> <span id="order-name-detail"></span></p>
+                        <p class="text-gray-400"><span class="font-medium">Client:</span> <span id="order-client-detail"></span></p>
+                        <p class="text-gray-400"><span class="font-medium">Data Comenzii:</span> <span id="order-date-detail"></span></p>
+                        <p class="text-gray-400"><span class="font-medium">Data Finisării:</span> <span id="order-finish-date-detail"></span></p>
+                        <p class="text-gray-400"><span class="font-medium">Descriere:</span> <span id="order-description-detail" class="whitespace-pre-wrap break-words"></span></p>
+                        <p class="text-gray-400"><span class="font-medium">Cost:</span> <span id="order-cost-detail"></span> lei</p>
+                        <div class="mt-4">
+                            <span class="text-gray-300 font-medium">Imagini:</span>
+                            <div id="order-images-detail" class="mt-2 grid grid-cols-3 gap-2"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-6 space-x-2">
+                        <button type="button" id="close-order-details-modal" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition">Închide</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
