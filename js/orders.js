@@ -252,6 +252,9 @@ document.addEventListener("DOMContentLoaded", () => {
         viewOrderDetails.classList.remove("hidden");
         editOrderForm.classList.add("hidden");
         orderDetailsModal.classList.remove("hidden");
+
+        // Adăugăm event listener pentru butonul „Editează” direct în funcție
+        editOrderBtn.addEventListener("click", showEditForm, { once: true });
     }
 
     function showEditForm() {
@@ -265,6 +268,15 @@ document.addEventListener("DOMContentLoaded", () => {
         // Ascundem secțiunea de vizualizare și afișăm formularul de editare
         viewOrderDetails.classList.add("hidden");
         editOrderForm.classList.remove("hidden");
+
+        // Adăugăm event listener pentru butonul „Anulează” și „Salvează” direct în funcție
+        cancelEditBtn.addEventListener("click", () => {
+            showOrderDetails(currentOrder); // Revenim la vizualizarea detaliilor
+        }, { once: true });
+
+        saveEditBtn.addEventListener("click", () => {
+            saveEditedOrder();
+        }, { once: true });
     }
 
     function saveEditedOrder() {
@@ -304,18 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Event listeners pentru modalul detaliilor
     closeOrderDetailsModal.addEventListener("click", () => {
         orderDetailsModal.classList.add("hidden");
-    });
-
-    editOrderBtn.addEventListener("click", () => {
-        showEditForm();
-    });
-
-    cancelEditBtn.addEventListener("click", () => {
-        showOrderDetails(currentOrder); // Revenim la vizualizarea detaliilor
-    });
-
-    saveEditBtn.addEventListener("click", () => {
-        saveEditedOrder();
     });
 
     // Gestionare lightbox (dacă e deja definit în common.js sau altundeva)
