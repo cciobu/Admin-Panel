@@ -384,3 +384,18 @@ body {
         max-width: 100%;
     }
 }
+
+/* Stil pentru modalul detaliilor comenzii */
+#order-details-modal .modal-content {
+    background: rgba(30, 41, 59, 0.95);
+    border: 2px solid #3b82f6;
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.7);
+    border-radius: 1rem;
+    transform: scale(0.9);
+    transition: all 0.3s ease;
+    padding: 1.5rem;
+}
+
+#order-details-modal:not(.hidden) .modal-content {
+    transform: scale(1);
+}
