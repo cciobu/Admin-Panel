@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const orderDescriptionInput = document.getElementById("order-description");
     const orderImagesInput = document.getElementById("order-images");
     const orderCostInput = document.getElementById("order-cost");
+    const orderDetailsModal = document.getElementById("order-details-modal");
+    const closeOrderDetailsModal = document.getElementById("close-order-details-modal");
 
     // Populăm select-ul cu clienți
     function populateClientSelect() {
@@ -79,10 +81,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const end = start + ordersPerPage;
         const paginatedOrders = filteredOrders.slice(start, end);
 
-        paginatedOrders.forEach(order => {
+        paginatedOrders.forEach((order, index) => {
+            const globalIndex = allOrders.indexOf(order);
             const rowHTML = `
-                <tr class="table-row" data-client-id="${order.clientIndex}">
-                    <td class="p-4"><a href="client-details.html?id=${order.clientIndex}" class="text-blue-400 hover:text-blue-300">${order.orderName}</a></td>
+                <tr class="table-row cursor-pointer" data-order-index="${globalIndex}">
+                    <td class="p-4">${order.orderName}</td>
                     <td class="p-4">${order.clientName}</td>
                     <td class="p-4">${order.orderDate}</td>
                     <td class="p-4">${order.finishDate}</td>
@@ -94,11 +97,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const rows = tableBody.querySelectorAll(".table-row");
         rows.forEach(row => {
-            row.addEventListener("click", (e) => {
-                if (e.target.tagName !== "A") {
-                    const link = row.querySelector("a");
-                    if (link) link.click();
-                }
+            row.addEventListener("click", () => {
+                showOrderDetails(allOrders[row.dataset.orderIndex]);
             });
         });
 
@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
         pagination.appendChild(nextBtn);
     }
 
-    // Event listeners
+    // Event listeners pentru sortare și căutare
     searchInput.addEventListener("input", () => {
         currentTablePage = 1;
         renderOrders(searchInput.value, sortDropdown.value);
@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
         downloadAnchor.remove();
     });
 
-    // Gestionare modal
+    // Gestionare modal Adăugare/Editare Comandă
     addOrderBtn.addEventListener("click", () => {
         orderModalTitle.textContent = "Adaugă Comandă";
         orderForm.reset();
@@ -215,6 +215,51 @@ document.addEventListener("DOMContentLoaded", () => {
             orderModal.classList.add("hidden");
         });
     });
+
+    // Gestionare modal Detalii Comandă
+    function showOrderDetails(order) {
+        document.getElementById("order-name-detail").textContent = order.orderName;
+        document.getElementById("order-client-detail").textContent = order.clientName;
+        document.getElementById("order-date-detail").textContent = order.orderDate;
+        document.getElementById("order-finish-date-detail").textContent = order.finishDate;
+        document.getElementById("order-description-detail").textContent = order.description || "N/A";
+        document.getElementById("order-cost-detail").textContent = order.cost || 0;
+
+        const orderImagesDetail = document.getElementById("order-images-detail");
+        orderImagesDetail.innerHTML = "";
+        (order.images || []).forEach(img => {
+            const imgElement = document.createElement("img");
+            imgElement.src = img;
+            imgElement.className = "w-20 h-20 object-cover rounded cursor-pointer";
+            imgElement.addEventListener("click", () => {
+                const lightbox = document.getElementById("lightbox");
+                const lightboxImage = document.getElementById("lightbox-image");
+                lightboxImage.src = img;
+                lightbox.classList.remove("hidden");
+            });
+            orderImagesDetail.appendChild(imgElement);
+        });
+
+        orderDetailsModal.classList.remove("hidden");
+    }
+
+    closeOrderDetailsModal.addEventListener("click", () => {
+        orderDetailsModal.classList.add("hidden");
+    });
+
+    // Gestionare lightbox (dacă e deja definit în common.js sau altundeva)
+    const lightbox = document.getElementById("lightbox");
+    if (lightbox) {
+        const closeLightbox = document.getElementById("close-lightbox");
+        closeLightbox.addEventListener("click", () => {
+            lightbox.classList.add("hidden");
+        });
+        lightbox.addEventListener("click", (e) => {
+            if (e.target === lightbox) {
+                lightbox.classList.add("hidden");
+            }
+        });
+    }
 
     renderOrders(); // Inițializăm tabelul cu sortare implicită orderDate-asc
 });
