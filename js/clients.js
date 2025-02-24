@@ -22,8 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function sortClients(clients, sortType) {
         const [field, direction] = sortType.split("-");
         return clients.sort((a, b) => {
-            let valA = a[field];
-            let valB = b[field];
+            let valA = a[field] || "";
+            let valB = b[field] || "";
             if (field === "status") {
                 valA = valA === "Activ" ? 0 : 1;
                 valB = valB === "Activ" ? 0 : 1;
@@ -40,7 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
         tableBody.innerHTML = ""; // Resetăm tabelul
         const filteredClients = clients.filter(client => 
             client.name.toLowerCase().includes(filter.toLowerCase()) || 
-            client.email.toLowerCase().includes(filter.toLowerCase())
+            (client.email && client.email.toLowerCase().includes(filter.toLowerCase())) ||
+            (client.phone && client.phone.toLowerCase().includes(filter.toLowerCase()))
         );
         sortClients(filteredClients, sortType);
         const start = (currentTablePage - 1) * clientsPerPage;
@@ -52,7 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const rowHTML = `
                 <tr class="table-row" data-client-id="${globalIndex}">
                     <td class="p-4"><a href="client-details.html?id=${globalIndex}" class="text-blue-400 hover:text-blue-300">${client.name}</a></td>
-                    <td class="p-4">${client.email}</td>
+                    <td class="p-4">${client.email || "N/A"}</td>
+                    <td class="p-4">${client.phone || "N/A"}</td>
                     <td class="p-4 ${client.status === 'Activ' ? 'status-active' : 'status-inactive'}">${client.status}</td>
                     <td class="p-4">
                         <button class="edit-btn text-blue-400 hover:text-blue-300" data-index="${globalIndex}">Editează</button>
@@ -161,10 +163,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     form.addEventListener("submit", (e) => {
         e.preventDefault();
+        if (!phoneInput.value) {
+            alert("Numărul de telefon este obligatoriu!");
+            return;
+        }
+
         const newClient = {
             name: nameInput.value,
-            email: emailInput.value,
-            phone: phoneInput.value || "",
+            email: emailInput.value || "", // Email nu mai este obligatoriu
+            phone: phoneInput.value, // Telefon este obligatoriu
             status: statusInput.value,
             orders: []
         };
@@ -185,8 +192,8 @@ document.addEventListener("DOMContentLoaded", () => {
         editIndex = index;
         const client = clients[index];
         nameInput.value = client.name;
-        emailInput.value = client.email;
-        phoneInput.value = client.phone || "";
+        emailInput.value = client.email || ""; // Nu mai impune email obligatoriu
+        phoneInput.value = client.phone || ""; // Telefon obligatoriu
         statusInput.value = client.status;
         modalTitle.textContent = "Editează Client";
         modal.classList.remove("hidden");
