@@ -220,6 +220,12 @@ body {
     border-radius: 0.375rem;
 }
 
+/* Ajustare lățime coloană Număr de telefon în tabel */
+#client-table th:nth-child(3),
+#client-table td:nth-child(3) {
+    width: 15%; /* Ajustează lățimea pentru a se potrivi design-ului */
+}
+
 /* -------------------------------- */
 /* Stiluri comune (Modaluri, Butoane, Tabele) */
 /* -------------------------------- */
