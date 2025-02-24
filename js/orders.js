@@ -188,40 +188,57 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     orderForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const clientIndex = parseInt(orderClientSelect.value);
-        if (isNaN(clientIndex)) {
-            alert("Te rog selectează un client!");
-            return;
-        }
+    e.preventDefault();
+    console.log("Formular trimis. Verificăm datele...");
 
-        const files = orderImagesInput.files;
-        const readerPromises = [];
-        for (let file of files) {
-            const reader = new FileReader();
-            readerPromises.push(new Promise((resolve) => {
-                reader.onload = () => resolve(reader.result);
-                reader.readAsDataURL(file);
-            }));
-        }
+    const clientIndex = parseInt(orderClientSelect.value);
+    console.log("Client Index:", clientIndex);
 
-        Promise.all(readerPromises).then((imageData) => {
+    if (isNaN(clientIndex)) {
+        console.warn("Nu s-a selectat un client!");
+        alert("Te rog selectează un client!");
+        return;
+    }
+
+    const files = orderImagesInput.files;
+    console.log("Fișiere de imagini:", files);
+
+    const readerPromises = [];
+    for (let file of files) {
+        const reader = new FileReader();
+        readerPromises.push(new Promise((resolve) => {
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => console.error("Eroare la citirea fișierului:", file);
+            reader.readAsDataURL(file);
+        }));
+    }
+
+    Promise.all(readerPromises)
+        .then((imageData) => {
+            console.log("Imagini procesate:", imageData);
             const newOrder = {
                 orderName: orderNameInput.value,
                 orderDate: orderDateInput.value,
                 finishDate: orderFinishDateInput.value,
                 description: orderDescriptionInput.value,
-                images: imageData,
+                images: imageData.length > 0 ? imageData : [],
                 cost: parseFloat(orderCostInput.value) || 0
             };
+
+            console.log("Noua comandă:", newOrder);
 
             clients[clientIndex].orders = clients[clientIndex].orders || [];
             clients[clientIndex].orders.push(newOrder);
             saveClients(clients);
             renderOrders(searchInput.value, sortDropdown.value);
             orderModal.classList.add("hidden");
+            console.log("Comanda salvată cu succes.");
+        })
+        .catch((error) => {
+            console.error("Eroare la procesarea imaginilor:", error);
+            alert("A apărut o eroare la procesarea imaginilor. Verifică consola pentru detalii.");
         });
-    });
+});
 
     // Gestionare modal Detalii/Editare Comandă
     function showOrderDetails(order) {
