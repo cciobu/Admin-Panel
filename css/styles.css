@@ -399,3 +399,13 @@ body {
 #order-details-modal:not(.hidden) .modal-content {
     transform: scale(1);
 }
+
+/* Stil pentru secțiunile din modalul detaliilor comenzii */
+#order-details-modal #view-order-details,
+#order-details-modal #edit-order-form {
+    width: 100%;
+}
+
+#order-details-modal .hidden {
+    display: none;
+}
