@@ -22,6 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const orderCostInput = document.getElementById("order-cost");
     const orderDetailsModal = document.getElementById("order-details-modal");
     const closeOrderDetailsModal = document.getElementById("close-order-details-modal");
+    const editOrderBtn = document.getElementById("edit-order-btn");
+    const cancelEditBtn = document.getElementById("cancel-edit-btn");
+    const saveEditBtn = document.getElementById("save-edit-btn");
+    const viewOrderDetails = document.getElementById("view-order-details");
+    const editOrderForm = document.getElementById("edit-order-form");
+
+    let currentOrder = null;
 
     // Populăm select-ul cu clienți
     function populateClientSelect() {
@@ -216,10 +223,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Gestionare modal Detalii Comandă
+    // Gestionare modal Detalii/Editare Comandă
     function showOrderDetails(order) {
+        currentOrder = order;
         document.getElementById("order-name-detail").textContent = order.orderName;
-        document.getElementById("order-client-detail").textContent = order.clientName;
+        document.getElementById("order-client-detail").innerHTML = `<a href="client-details.html?id=${order.clientIndex}" id="client-link" class="text-blue-400 hover:text-blue-300">${order.clientName}</a>`;
         document.getElementById("order-date-detail").textContent = order.orderDate;
         document.getElementById("order-finish-date-detail").textContent = order.finishDate;
         document.getElementById("order-description-detail").textContent = order.description || "N/A";
@@ -240,11 +248,74 @@ document.addEventListener("DOMContentLoaded", () => {
             orderImagesDetail.appendChild(imgElement);
         });
 
+        // Afișăm secțiunea de vizualizare și ascundem formularul de editare
+        viewOrderDetails.classList.remove("hidden");
+        editOrderForm.classList.add("hidden");
         orderDetailsModal.classList.remove("hidden");
     }
 
+    function showEditForm() {
+        // Completăm formularul cu datele curente
+        document.getElementById("edit-order-name").value = currentOrder.orderName;
+        document.getElementById("edit-order-date").value = currentOrder.orderDate;
+        document.getElementById("edit-order-finish-date").value = currentOrder.finishDate;
+        document.getElementById("edit-order-description").value = currentOrder.description || "";
+        document.getElementById("edit-order-cost").value = currentOrder.cost || 0;
+
+        // Ascundem secțiunea de vizualizare și afișăm formularul de editare
+        viewOrderDetails.classList.add("hidden");
+        editOrderForm.classList.remove("hidden");
+    }
+
+    function saveEditedOrder() {
+        const clientIndex = currentOrder.clientIndex;
+        const orderIndex = clients[clientIndex].orders.findIndex(order => 
+            order.orderName === currentOrder.orderName && 
+            order.orderDate === currentOrder.orderDate
+        );
+
+        const files = document.getElementById("edit-order-images").files;
+        const readerPromises = [];
+        for (let file of files) {
+            const reader = new FileReader();
+            readerPromises.push(new Promise((resolve) => {
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(file);
+            }));
+        }
+
+        Promise.all(readerPromises).then((imageData) => {
+            const updatedOrder = {
+                orderName: document.getElementById("edit-order-name").value,
+                orderDate: document.getElementById("edit-order-date").value,
+                finishDate: document.getElementById("edit-order-finish-date").value,
+                description: document.getElementById("edit-order-description").value,
+                images: imageData.length > 0 ? imageData : currentOrder.images,
+                cost: parseFloat(document.getElementById("edit-order-cost").value) || 0
+            };
+
+            clients[clientIndex].orders[orderIndex] = updatedOrder;
+            saveClients(clients);
+            currentOrder = updatedOrder;
+            showOrderDetails(currentOrder); // Reafișăm detaliile actualizate
+        });
+    }
+
+    // Event listeners pentru modalul detaliilor
     closeOrderDetailsModal.addEventListener("click", () => {
         orderDetailsModal.classList.add("hidden");
+    });
+
+    editOrderBtn.addEventListener("click", () => {
+        showEditForm();
+    });
+
+    cancelEditBtn.addEventListener("click", () => {
+        showOrderDetails(currentOrder); // Revenim la vizualizarea detaliilor
+    });
+
+    saveEditBtn.addEventListener("click", () => {
+        saveEditedOrder();
     });
 
     // Gestionare lightbox (dacă e deja definit în common.js sau altundeva)
