@@ -14,12 +14,19 @@ particlesJS("particles-js", {
 });
 
 // Funcții comune
+// Adăugăm această verificare la începutul scriptului sau în funcția getClients din common.js
 function getClients() {
-    return JSON.parse(localStorage.getItem("clients")) || [];
-}
-
-function saveClients(clients) {
-    localStorage.setItem("clients", JSON.stringify(clients));
+    let storedClients = JSON.parse(localStorage.getItem("clients")) || [];
+    // Verificăm și corectăm clienții lipsiți de telefon
+    storedClients = storedClients.map(client => ({
+        name: client.name || "",
+        email: client.email || "",
+        phone: client.phone || "", // Asigurăm că există un telefon
+        status: client.status || "Activ", // Valoare implicită
+        orders: client.orders || []
+    }));
+    localStorage.setItem("clients", JSON.stringify(storedClients));
+    return storedClients;
 }
 
 // Navigare sidebar și evidențiere tab activ
