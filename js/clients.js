@@ -1,4 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // Definim funcțiile esențiale local
+    function getClients() {
+        return JSON.parse(localStorage.getItem("clients")) || [];
+    }
+
+    function saveClients(clients) {
+        localStorage.setItem("clients", JSON.stringify(clients));
+    }
+
     let clients = getClients();
     let editIndex = null;
     let currentTablePage = 1;
@@ -183,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
             editIndex = null;
         }
 
-        saveClients(clients);
+        saveClients(clients); // Acum definit local
         renderClients(searchInput.value, sortDropdown.value);
         modal.classList.add("hidden");
     });
