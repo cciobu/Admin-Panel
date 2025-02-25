@@ -1,10 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Definim getClients local
+    // Definim funcțiile esențiale local
     function getClients() {
         return JSON.parse(localStorage.getItem("clients")) || [];
     }
 
-    // Definim saveClients local
     function saveClients(clients) {
         localStorage.setItem("clients", JSON.stringify(clients));
     }
@@ -42,9 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let currentOrder = null;
 
-    // Verificăm dacă elementele esențiale există
+    // Verificăm elementele esențiale
     if (!tableBody) console.error("Elementul #orders-table nu a fost găsit!");
     if (!addOrderBtn) console.error("Elementul #add-order-btn nu a fost găsit!");
+    if (!orderModal) console.error("Elementul #order-modal nu a fost găsit!");
 
     // Populăm select-ul cu clienți
     function populateClientSelect() {
@@ -114,26 +114,30 @@ document.addEventListener("DOMContentLoaded", () => {
         const end = start + ordersPerPage;
         const paginatedOrders = filteredOrders.slice(start, end);
 
-        paginatedOrders.forEach((order, index) => {
-            const globalIndex = allOrders.indexOf(order);
-            const rowHTML = `
-                <tr class="table-row cursor-pointer" data-order-index="${globalIndex}">
-                    <td class="p-4">${order.orderName}</td>
-                    <td class="p-4">${order.clientName}</td>
-                    <td class="p-4">${order.orderDate}</td>
-                    <td class="p-4">${order.finishDate}</td>
-                    <td class="p-4">${order.cost || 0} lei</td>
-                </tr>
-            `;
-            tableBody.insertAdjacentHTML("beforeend", rowHTML);
-        });
-
-        const rows = tableBody.querySelectorAll(".table-row");
-        rows.forEach(row => {
-            row.addEventListener("click", () => {
-                showOrderDetails(allOrders[row.dataset.orderIndex]);
+        if (paginatedOrders.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">Nu există comenzi.</td></tr>';
+        } else {
+            paginatedOrders.forEach((order, index) => {
+                const globalIndex = allOrders.indexOf(order);
+                const rowHTML = `
+                    <tr class="table-row cursor-pointer" data-order-index="${globalIndex}">
+                        <td class="p-4">${order.orderName}</td>
+                        <td class="p-4">${order.clientName}</td>
+                        <td class="p-4">${order.orderDate}</td>
+                        <td class="p-4">${order.finishDate}</td>
+                        <td class="p-4">${order.cost || 0} lei</td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML("beforeend", rowHTML);
             });
-        });
+
+            const rows = tableBody.querySelectorAll(".table-row");
+            rows.forEach(row => {
+                row.addEventListener("click", () => {
+                    showOrderDetails(allOrders[row.dataset.orderIndex]);
+                });
+            });
+        }
 
         const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
         renderPagination(totalPages);
@@ -223,6 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Gestionare modal Adăugare/Editare Comandă
     if (addOrderBtn) {
         addOrderBtn.addEventListener("click", () => {
+            console.log("Butonul Adaugă Comandă a fost apăsat!");
             orderModalTitle.textContent = "Adaugă Comandă";
             orderForm.reset();
             orderModal.classList.remove("hidden");
@@ -377,17 +382,21 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    closeOrderDetailsModal.addEventListener("click", () => {
-        orderDetailsModal.classList.add("hidden");
-    });
+    if (closeOrderDetailsModal) {
+        closeOrderDetailsModal.addEventListener("click", () => {
+            orderDetailsModal.classList.add("hidden");
+        });
+    }
 
     // Gestionare lightbox
     const lightbox = document.getElementById("lightbox");
     if (lightbox) {
         const closeLightbox = document.getElementById("close-lightbox");
-        closeLightbox.addEventListener("click", () => {
-            lightbox.classList.add("hidden");
-        });
+        if (closeLightbox) {
+            closeLightbox.addEventListener("click", () => {
+                lightbox.classList.add("hidden");
+            });
+        }
         lightbox.addEventListener("click", (e) => {
             if (e.target === lightbox) {
                 lightbox.classList.add("hidden");
@@ -396,7 +405,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Inițializăm tabelul cu sortare implicită
+    console.log("Încercăm să afișăm comenzile...");
     renderOrders();
-});
-    renderOrders(); // Inițializăm tabelul cu sortare implicită orderDate-asc
 });
