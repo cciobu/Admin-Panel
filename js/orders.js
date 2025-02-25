@@ -1,8 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // Obținem clienții din localStorage (presupunem că getClients există în common.js)
     let clients = getClients();
     let currentTablePage = 1;
     const ordersPerPage = 50;
 
+    // Definim funcția saveClients local, pentru a evita eroarea "not defined"
+    function saveClients(clients) {
+        localStorage.setItem("clients", JSON.stringify(clients));
+    }
+
+    // Elementele DOM
     const tableBody = document.getElementById("orders-table");
     const exportBtn = document.getElementById("export-btn");
     const searchInput = document.getElementById("search-input");
@@ -57,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return allOrders;
     }
 
+    // Funcție pentru sortarea comenzilor
     function sortOrders(orders, sortType) {
         const [field, direction] = sortType.split("-");
         return orders.sort((a, b) => {
@@ -76,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Afișăm comenzile în tabel
     function renderOrders(search = "", sortType = "orderDate-asc") {
         tableBody.innerHTML = "";
         const allOrders = getAllOrders();
@@ -113,6 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderPagination(totalPages);
     }
 
+    // Paginare
     function renderPagination(totalPages) {
         pagination.innerHTML = "";
         if (totalPages <= 1) return;
@@ -164,9 +174,10 @@ document.addEventListener("DOMContentLoaded", () => {
         renderOrders(searchInput.value, sortDropdown.value);
     });
 
+    // Exportare comenzi
     exportBtn.addEventListener("click", () => {
         const allOrders = getAllOrders();
-        sortOrders(allOrders, sortDropdown.value); // Exportăm sortat
+        sortOrders(allOrders, sortDropdown.value);
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allOrders));
         const downloadAnchor = document.createElement("a");
         downloadAnchor.setAttribute("href", dataStr);
@@ -188,57 +199,57 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     orderForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    console.log("Formular trimis. Verificăm datele...");
+        e.preventDefault();
+        console.log("Formular trimis. Verificăm datele...");
 
-    const clientIndex = parseInt(orderClientSelect.value);
-    console.log("Client Index:", clientIndex);
+        const clientIndex = parseInt(orderClientSelect.value);
+        console.log("Client Index:", clientIndex);
 
-    if (isNaN(clientIndex)) {
-        console.warn("Nu s-a selectat un client!");
-        alert("Te rog selectează un client!");
-        return;
-    }
+        if (isNaN(clientIndex)) {
+            console.warn("Nu s-a selectat un client!");
+            alert("Te rog selectează un client!");
+            return;
+        }
 
-    const files = orderImagesInput.files;
-    console.log("Fișiere de imagini:", files);
+        const files = orderImagesInput.files;
+        console.log("Fișiere de imagini:", files);
 
-    const readerPromises = [];
-    for (let file of files) {
-        const reader = new FileReader();
-        readerPromises.push(new Promise((resolve) => {
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => console.error("Eroare la citirea fișierului:", file);
-            reader.readAsDataURL(file);
-        }));
-    }
+        const readerPromises = [];
+        for (let file of files) {
+            const reader = new FileReader();
+            readerPromises.push(new Promise((resolve) => {
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => console.error("Eroare la citirea fișierului:", file);
+                reader.readAsDataURL(file);
+            }));
+        }
 
-    Promise.all(readerPromises)
-        .then((imageData) => {
-            console.log("Imagini procesate:", imageData);
-            const newOrder = {
-                orderName: orderNameInput.value,
-                orderDate: orderDateInput.value,
-                finishDate: orderFinishDateInput.value,
-                description: orderDescriptionInput.value,
-                images: imageData.length > 0 ? imageData : [],
-                cost: parseFloat(orderCostInput.value) || 0
-            };
+        Promise.all(readerPromises)
+            .then((imageData) => {
+                console.log("Imagini procesate:", imageData);
+                const newOrder = {
+                    orderName: orderNameInput.value,
+                    orderDate: orderDateInput.value,
+                    finishDate: orderFinishDateInput.value,
+                    description: orderDescriptionInput.value,
+                    images: imageData.length > 0 ? imageData : [],
+                    cost: parseFloat(orderCostInput.value) || 0
+                };
 
-            console.log("Noua comandă:", newOrder);
+                console.log("Noua comandă:", newOrder);
 
-            clients[clientIndex].orders = clients[clientIndex].orders || [];
-            clients[clientIndex].orders.push(newOrder);
-            saveClients(clients);
-            renderOrders(searchInput.value, sortDropdown.value);
-            orderModal.classList.add("hidden");
-            console.log("Comanda salvată cu succes.");
-        })
-        .catch((error) => {
-            console.error("Eroare la procesarea imaginilor:", error);
-            alert("A apărut o eroare la procesarea imaginilor. Verifică consola pentru detalii.");
-        });
-});
+                clients[clientIndex].orders = clients[clientIndex].orders || [];
+                clients[clientIndex].orders.push(newOrder);
+                saveClients(clients); // Acum funcționează local
+                renderOrders(searchInput.value, sortDropdown.value);
+                orderModal.classList.add("hidden");
+                console.log("Comanda salvată cu succes.");
+            })
+            .catch((error) => {
+                console.error("Eroare la procesarea imaginilor:", error);
+                alert("A apărut o eroare la procesarea imaginilor.");
+            });
+    });
 
     // Gestionare modal Detalii/Editare Comandă
     function showOrderDetails(order) {
@@ -265,30 +276,25 @@ document.addEventListener("DOMContentLoaded", () => {
             orderImagesDetail.appendChild(imgElement);
         });
 
-        // Afișăm secțiunea de vizualizare și ascundem formularul de editare
         viewOrderDetails.classList.remove("hidden");
         editOrderForm.classList.add("hidden");
         orderDetailsModal.classList.remove("hidden");
 
-        // Adăugăm event listener pentru butonul „Editează” direct în funcție
         editOrderBtn.addEventListener("click", showEditForm, { once: true });
     }
 
     function showEditForm() {
-        // Completăm formularul cu datele curente
         document.getElementById("edit-order-name").value = currentOrder.orderName;
         document.getElementById("edit-order-date").value = currentOrder.orderDate;
         document.getElementById("edit-order-finish-date").value = currentOrder.finishDate;
         document.getElementById("edit-order-description").value = currentOrder.description || "";
         document.getElementById("edit-order-cost").value = currentOrder.cost || 0;
 
-        // Ascundem secțiunea de vizualizare și afișăm formularul de editare
         viewOrderDetails.classList.add("hidden");
         editOrderForm.classList.remove("hidden");
 
-        // Adăugăm event listener pentru butonul „Anulează” și „Salvează” direct în funcție
         cancelEditBtn.addEventListener("click", () => {
-            showOrderDetails(currentOrder); // Revenim la vizualizarea detaliilor
+            showOrderDetails(currentOrder);
         }, { once: true });
 
         saveEditBtn.addEventListener("click", () => {
@@ -326,11 +332,10 @@ document.addEventListener("DOMContentLoaded", () => {
             clients[clientIndex].orders[orderIndex] = updatedOrder;
             saveClients(clients);
             currentOrder = updatedOrder;
-            showOrderDetails(currentOrder); // Reafișăm detaliile actualizate
+            showOrderDetails(currentOrder);
         });
     }
 
-    // Event listeners pentru modalul detaliilor
     closeOrderDetailsModal.addEventListener("click", () => {
         orderDetailsModal.classList.add("hidden");
     });
@@ -348,6 +353,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    // Inițializăm tabelul cu sortare implicită
+    renderOrders();
+});
 
     renderOrders(); // Inițializăm tabelul cu sortare implicită orderDate-asc
 });
