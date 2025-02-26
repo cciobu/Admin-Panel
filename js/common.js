@@ -66,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Hamburger found:", hamburger);
     console.log("Sidebar found:", sidebar);
 
-    // Verificăm dacă elementele sunt găsite
     if (!sidebar || !hamburger || sidebarLinks.length === 0) {
         console.error("Unul sau mai multe elemente esențiale lipsesc!");
         return;
@@ -96,24 +95,17 @@ document.addEventListener("DOMContentLoaded", () => {
             if (window.innerWidth <= 768) {
                 console.log("Închidem sidebar-ul pe mobil");
                 sidebar.classList.remove("open");
-                // Navigăm manual fără întârziere pentru testare
-                window.location.href = href;
+                sidebar.style.width = "0"; // Forțăm închiderea completă
+                // Așteptăm 300ms pentru a vedea închiderea (tranziția CSS)
+                setTimeout(() => {
+                    console.log("Navigăm la:", href);
+                    window.location.href = href;
+                }, 300);
             } else {
                 console.log("Navigare directă pe desktop");
                 window.location.href = href;
             }
         });
-    });
-
-    // Evidențiere tab activ bazat pe URL
-    const currentPage = window.location.pathname.split("/").pop() || "index.html";
-    sidebarItems.forEach(item => {
-        const link = item.querySelector("a");
-        if (link && link.getAttribute("href") === currentPage) {
-            item.classList.add("bg-blue-700", "font-semibold");
-        } else {
-            item.classList.remove("bg-blue-700", "font-semibold");
-        }
     });
 
     // Gestionare hamburger
@@ -127,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && sidebar.classList.contains("open")) {
             console.log("Click în afara sidebar-ului, închidem");
             sidebar.classList.remove("open");
+            sidebar.style.width = "0"; // Forțăm închiderea completă
         }
     });
 
@@ -135,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (window.innerWidth > 768 && sidebar.classList.contains("open")) {
             console.log("Redimensionare la desktop, închidem sidebar-ul");
             sidebar.classList.remove("open");
+            sidebar.style.width = "0";
         }
     });
 });
