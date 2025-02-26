@@ -24,7 +24,7 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    width: 64;
+    width: 64px; /* Modificat de la "64" la "64px" pentru claritate */
     height: 100%;
     transition: width 0.3s ease;
     backdrop-filter: blur(10px);
@@ -32,7 +32,6 @@ body {
     z-index: 10;
 }
 
-/* Eliminăm hover pe mobil */
 @media (min-width: 769px) {
     .sidebar:hover {
         width: 280px;
