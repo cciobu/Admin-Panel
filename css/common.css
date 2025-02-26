@@ -32,6 +32,27 @@ body {
     z-index: 10;
 }
 
+/* Eliminăm hover pe mobil */
+@media (min-width: 769px) {
+    .sidebar:hover {
+        width: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 0;
+        overflow: hidden;
+        transition: width 0.3s ease;
+    }
+    .sidebar.open {
+        width: 280px;
+    }
+    .main-content {
+        margin-left: 0;
+    }
+}
+
 .sidebar:hover {
     width: 280px;
 }
