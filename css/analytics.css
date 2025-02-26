@@ -1,0 +1,45 @@
+/* -------------------------------- */
+/* Stiluri specifice Analytics (analytics.html) */
+/* -------------------------------- */
+
+#clientsChart,
+#ordersByMonthYearChart,
+#ordersTrendChart {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 300px !important; /* Limităm înălțimea maximă la 300px */
+    margin: 0 auto;
+    display: block;
+}
+
+.grid .card {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 1rem;
+    /* Eliminăm min-height pentru a lăsa conținutul să dicteze înălțimea */
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .grid .card {
+        padding: 0.75rem;
+    }
+    #clientsChart,
+    #ordersByMonthYearChart,
+    #ordersTrendChart {
+        max-height: 200px !important; /* Înălțime mai mică pe mobil */
+    }
+}
+
+/* Tema luminoasă */
+body.light-mode #clientsChart,
+body.light-mode #ordersByMonthYearChart,
+body.light-mode #ordersTrendChart {
+    color: #111827 !important;
+}

@@ -1,0 +1,35 @@
+/* -------------------------------- */
+/* Stiluri specifice Clients (clients.html) */
+/* -------------------------------- */
+
+/* Ajustare lățime coloană Acțiuni în tabel */
+#client-table th:last-child,
+#client-table td:last-child {
+    width: 15%;
+    min-width: 120px;
+}
+
+/* Tema luminoasă */
+body.light-mode #client-table {
+    background: #fafafa;
+    border: 1px solid #e2e8f0;
+}
+
+body.light-mode #client-table thead {
+    background: #f8fafc;
+    color: #374151;
+}
+
+body.light-mode #client-table td {
+    color: #1f2937;
+}
+
+body.light-mode .status-active {
+    color: #047857;
+    background: rgba(6, 95, 70, 0.1);
+}
+
+body.light-mode .status-inactive {
+    color: #b91c1c;
+    background: rgba(185, 28, 28, 0.1);
+}
