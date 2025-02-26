@@ -56,51 +56,55 @@ function getClients() {
 
 // Navigare sidebar și evidențiere tab activ
 document.addEventListener("DOMContentLoaded", () => {
-    const sidebarItems = document.querySelectorAll(".sidebar-item");
-    const sidebarLinks = document.querySelectorAll(".sidebar-item a");
-    const hamburger = document.querySelector(".hamburger");
     const sidebar = document.querySelector(".sidebar");
+    const hamburger = document.querySelector(".hamburger");
+    const sidebarLinks = document.querySelectorAll(".sidebar-item a");
 
-    console.log("Sidebar items found:", sidebarItems.length);
+    console.log("DOM fully loaded");
+    console.log("Sidebar found:", sidebar ? "Yes" : "No");
+    console.log("Hamburger found:", hamburger ? "Yes" : "No");
     console.log("Sidebar links found:", sidebarLinks.length);
-    console.log("Hamburger found:", hamburger);
-    console.log("Sidebar found:", sidebar);
 
-    if (!sidebar || !hamburger || sidebarLinks.length === 0) {
-        console.error("Unul sau mai multe elemente esențiale lipsesc!");
+    if (!sidebar) {
+        console.error("Sidebar nu a fost găsit!");
+        return;
+    }
+    if (!hamburger) {
+        console.error("Hamburger nu a fost găsit!");
+        return;
+    }
+    if (sidebarLinks.length === 0) {
+        console.error("Niciun link nu a fost găsit în sidebar!");
         return;
     }
 
-    // Navigare pe tot tab-ul
-    sidebarItems.forEach(item => {
-        item.addEventListener("click", (e) => {
-            if (e.target.tagName !== "A") {
-                const link = item.querySelector("a");
-                if (link) {
-                    console.log("Click pe item, declanșăm link:", link.getAttribute("href"));
-                    link.click();
-                }
-            }
-        });
+    // Gestionare hamburger
+    hamburger.addEventListener("click", () => {
+        console.log("Hamburger clicked, toggle sidebar");
+        sidebar.classList.toggle("open");
+        console.log("Sidebar open state:", sidebar.classList.contains("open"));
+        if (!sidebar.classList.contains("open")) {
+            sidebar.style.width = "0"; // Forțăm închiderea completă
+        }
     });
 
-    // Gestionăm click-ul pe link-uri
-    sidebarLinks.forEach(link => {
+    // Gestionăm click-ul pe link-urile din sidebar
+    sidebarLinks.forEach((link, index) => {
+        console.log(`Atașăm eveniment pe link ${index}:`, link.getAttribute("href"));
         link.addEventListener("click", (e) => {
             e.preventDefault(); // Oprim navigarea implicită
             const href = link.getAttribute("href");
-            console.log("Link clicked:", href);
+            console.log(`Link ${index} clicked:`, href);
 
             // Închidem sidebar-ul pe mobil
             if (window.innerWidth <= 768) {
                 console.log("Închidem sidebar-ul pe mobil");
                 sidebar.classList.remove("open");
                 sidebar.style.width = "0"; // Forțăm închiderea completă
-                // Așteptăm 300ms pentru a vedea închiderea (tranziția CSS)
                 setTimeout(() => {
                     console.log("Navigăm la:", href);
                     window.location.href = href;
-                }, 300);
+                }, 300); // Așteptăm tranziția
             } else {
                 console.log("Navigare directă pe desktop");
                 window.location.href = href;
@@ -108,18 +112,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Gestionare hamburger
-    hamburger.addEventListener("click", () => {
-        console.log("Hamburger clicked, toggle sidebar");
-        sidebar.classList.toggle("open");
-    });
-
     // Închidem sidebar-ul la click în afara lui
     document.addEventListener("click", (e) => {
         if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && sidebar.classList.contains("open")) {
             console.log("Click în afara sidebar-ului, închidem");
             sidebar.classList.remove("open");
-            sidebar.style.width = "0"; // Forțăm închiderea completă
+            sidebar.style.width = "0";
         }
     });
 
@@ -129,6 +127,18 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Redimensionare la desktop, închidem sidebar-ul");
             sidebar.classList.remove("open");
             sidebar.style.width = "0";
+        }
+    });
+
+    // Evidențiere tab activ bazat pe URL
+    const sidebarItems = document.querySelectorAll(".sidebar-item");
+    const currentPage = window.location.pathname.split("/").pop() || "index.html";
+    sidebarItems.forEach(item => {
+        const link = item.querySelector("a");
+        if (link && link.getAttribute("href") === currentPage) {
+            item.classList.add("bg-blue-700", "font-semibold");
+        } else {
+            item.classList.remove("bg-blue-700", "font-semibold");
         }
     });
 });
