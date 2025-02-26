@@ -57,10 +57,11 @@ function getClients() {
 // Navigare sidebar și evidențiere tab activ
 document.addEventListener("DOMContentLoaded", () => {
     const sidebarItems = document.querySelectorAll(".sidebar-item");
+    const sidebarLinks = document.querySelectorAll(".sidebar-item a");
     const hamburger = document.querySelector(".hamburger");
     const sidebar = document.querySelector(".sidebar");
 
-    // Navigare pe tot tab-ul
+    // Navigare pe tot tab-ul (fără închidere aici)
     sidebarItems.forEach(item => {
         item.addEventListener("click", (e) => {
             if (e.target.tagName !== "A") {
@@ -69,7 +70,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     link.click();
                 }
             }
-            // Închidem sidebar-ul pe mobil după click pe item
+        });
+    });
+
+    // Închidem sidebar-ul la click pe link doar pe mobil
+    sidebarLinks.forEach(link => {
+        link.addEventListener("click", () => {
             if (window.innerWidth <= 768) {
                 sidebar.classList.remove("open");
             }
