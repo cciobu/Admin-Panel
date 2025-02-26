@@ -38,3 +38,18 @@ body.light-mode #particles-js + .main-content .card:hover {
     transform: scale(1.05);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 }
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    .card {
+        padding: 1rem;
+        max-width: 100%;
+    }
+    #clientsDistributionChart {
+        max-width: 150px !important;
+        max-height: 150px !important;
+    }
+}
